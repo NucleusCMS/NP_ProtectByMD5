@@ -69,7 +69,7 @@ class NP_ProtectByMD5 extends NucleusPlugin {
 		default:
 		}
 	}
-	function event_FormExtra(&$data){
+	function event_FormExtra($data){
 		if ($this->getOption('formextra')!='yes') return;
 		if ($this->getOption('usethis')!='yes' || $this->_checkIP()) return;// _checkIP() also checks if member is logged in
 		if (!($action=$data['type'])) return;
@@ -146,6 +146,8 @@ class NP_ProtectByMD5 extends NucleusPlugin {
 			$message.=htmlspecialchars($error,ENT_QUOTES);
 			ACTIONLOG::add(WARNING,$message);
 		}
+		header("HTTP/1.1 404 Not Found");
+		exit;
 		header('Content-type: text/html; charset='._CHARSET);
 		echo '<html><head><title>Error</title></head><body>Wrong MD5 hash or expired key!<br /><br />';
 //$this->createOption('errormessage', $this->translated('Error message for invalid action:'), 'textarea', $this->translated('Please go back, reload the page, and do this again.'));
@@ -174,7 +176,7 @@ class NP_ProtectByMD5 extends NucleusPlugin {
 		return $this->accept;
 	}
 	function translated($english){
-		if (!is_array($this->langArray)) {
+		if (!isset($this->langArray) || !is_array($this->langArray)) {
 			$this->langArray=array();
 			$language=$this->getDirectory().str_replace( array('\\','/'), array('',''), getLanguageName()).'.php';
 			if (file_exists($language)) include($language);
